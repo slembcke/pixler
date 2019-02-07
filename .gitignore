@@ -1,0 +1,7 @@
+*.o
+*.lib
+
+png2chr
+chr2png
+png2tiles
+lz4x
