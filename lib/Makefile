@@ -20,6 +20,7 @@ SRC = \
 	inc.s \
 	fill.s \
 	blit.s \
+	str.s \
 	sprite.s \
 	lz4.s \
 	lz4_to_vram.s \

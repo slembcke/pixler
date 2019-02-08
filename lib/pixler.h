@@ -82,10 +82,6 @@ void px_uxrom_select(u8 bank);
 // PPU Address of a color in the palette.
 #define PAL_ADDR 0x3F00
 
-// PPU auto-increment direction constants.
-#define PX_INC1 0 // Increment to the right.
-#define PX_INC32 1 // Increment down.
-
 // These functions are only safe to call when the PPU is disabled! 
 
 // Set the PPU address register.
@@ -100,6 +96,10 @@ void px_fill(u16 len, char chr);
 
 // Copy a range of bytes from the CPU to the PPU.
 void px_blit(u16 len, const u8 *src);
+
+// Copies up to 256 bytes from a NULL terminated ASCII string to the PPU.
+// Cannot handle newlines.
+void px_str(const char *str);
 
 // Execute buffered commands immediately. (See next section)
 void px_buffer_exec(void);
