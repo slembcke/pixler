@@ -7,6 +7,7 @@
 // Convince vscode to ignore cc65 features.
 #ifndef __CC65__
 	#define asm(...)
+	#define __A__ 0
 	#define __AX__ 0
 	#define __EAX__ 0
 	#define __fastcall__
