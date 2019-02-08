@@ -1,5 +1,3 @@
-CC65_ROOT = /Users/slembcke/Development/NES/cc65
-
 CC = $(CC65_ROOT)/bin/cc65
 AS = $(CC65_ROOT)/bin/ca65
 LD = $(CC65_ROOT)/bin/ld65
