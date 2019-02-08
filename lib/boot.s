@@ -15,7 +15,7 @@
 
 .segment "HEADER"
 
-	.byte "NES", $1a ; iNES Magic number.
+	.byte "NES", $1A ; iNES Magic number.
 	.byte <NES_PRG_BANKS
 	.byte <NES_CHR_BANKS
 	.byte <((<NES_MAPPER<<4) | NES_MIRRORING)
@@ -134,6 +134,6 @@
 .endproc
 
 .segment "VECTORS"
-	.word px_nmi
-	.word start
-	.word irq
+	.addr px_nmi
+	.addr start
+	.addr irq

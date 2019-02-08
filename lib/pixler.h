@@ -4,14 +4,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <nes.h>
-
 // Convince vscode to ignore cc65 features.
 #ifndef __CC65__
 	#define asm(...)
 	#define __AX__ 0
 	#define __EAX__ 0
+	#define __fastcall__
 #endif
+
+#include <nes.h>
+#include <joystick.h>
 
 // Some handy definitions.
 
