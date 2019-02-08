@@ -71,7 +71,7 @@
 	lda #0
 	sta PPU_VRAM_ADDR
 	sta PPU_VRAM_ADDR
-	ldy #$40 ; Number of pages.
+	ldy #$3F ; Number of pages.
 	ldx #0 ; Byte counter.
 	:	sta PPU_VRAM_IO
 		inx
@@ -79,12 +79,14 @@
 		dey
 		bne :-
 	
-	; Set BG color to black.
-	lda #>PPU_PAL0
-	sta PPU_VRAM_ADDR
-	lda #<PPU_PAL0
-	sta PPU_VRAM_ADDR
+	; Set the first palette to something usable.
+	; Black, black, white, white
+	jsr _waitvsync
+	lda #$1D
+	sta PPU_VRAM_IO
+	sta PPU_VRAM_IO
 	lda #$30
+	sta PPU_VRAM_IO
 	sta PPU_VRAM_IO
 	
 	; Move sprites offscreen.

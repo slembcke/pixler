@@ -6,7 +6,7 @@
 .importzp PX_scroll_x
 .importzp PX_scroll_y
 .import _px_buffer_exec
-.import FamiToneUpdate
+.import _px_nmi_callback
 
 .export px_nmi
 
@@ -94,7 +94,7 @@
 	sta px_nmi_ready
 	
 	@skip_frame:
-	jsr FamiToneUpdate
+	jsr _px_nmi_callback
 	
 	; Interrupt exit.
 	pla
