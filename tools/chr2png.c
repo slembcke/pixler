@@ -54,7 +54,9 @@ int main(int argc, char *argv[]){
 	
 	uint tile_count = size/16;
 	uint w = 128;
-	uint h = 8*(tile_count + 15)/16;
+	uint h = 8*((tile_count + 15)/16);
+	
+	// SLIB_LOG("#:%d, w:%d, h:%d", tile_count, w, h);
 	
 	png_init_io(png_ptr, outfile);
 	png_set_IHDR(png_ptr, info, w, h, 2, PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
