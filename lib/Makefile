@@ -16,6 +16,7 @@ SRC = \
 	buffer_inc.s \
 	buffer_color.s \
 	buffer_data.s \
+	buffer_blit.s \
 	inc.s \
 	fill.s \
 	blit.s \

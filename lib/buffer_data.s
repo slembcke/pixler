@@ -11,8 +11,6 @@
 
 .export _px_buffer_data
 .proc _px_buffer_data ; u8 len, u16 addr
-	_len = 0
-	; _addr = x|a
 	cmd_bytes = (2 + 3) ; func + len + addr
 	
 	ldy px_buffer_cursor

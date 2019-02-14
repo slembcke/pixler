@@ -35,6 +35,7 @@ extern u8 px_mask;
 extern u8 px_ctrl;
 #pragma zpsym("px_ctrl");
 
+#define PX_MASK_RENDER_DISABLE 0
 #define PX_MASK_GRAY 0x01
 #define PX_MASK_BG_ENABLE 0x0E
 #define PX_MASK_SPRITE_ENABLE 0x10
@@ -48,7 +49,7 @@ extern u8 px_ctrl;
 #define px_profile_end() {px_mask &= ~PX_MASK_GRAY; PPU.mask = px_mask;}
 
 #define px_ppu_enable(flags) px_set_mask_nmi(flags | PX_MASK_RENDER_ENABLE)
-#define px_ppu_disable() px_set_mask_nmi(0x00)
+#define px_ppu_disable() px_set_mask_nmi(PX_MASK_RENDER_DISABLE)
 
 #define px_spr_table(tbl) {px_ctrl |= (tbl ? 0xFF : 0x00) & PX_CTRL_SPR_TABLE_ADDR; PPU.control = px_ctrl;}
 #define px_bg_table(tbl) {px_ctrl |= (tbl ? 0xFF : 0x00) & PX_CTRL_BG_TABLE_ADDR; PPU.control = px_ctrl;}
