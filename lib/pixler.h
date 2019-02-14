@@ -37,6 +37,9 @@ extern u8 px_ctrl;
 
 #define PX_MASK_RENDER_DISABLE 0
 #define PX_MASK_GRAY 0x01
+#define PX_MASK_EMPHASIS_R 0x20
+#define PX_MASK_EMPHASIS_G 0x40
+#define PX_MASK_EMPHASIS_B 0x80
 #define PX_MASK_BG_ENABLE 0x0E
 #define PX_MASK_SPRITE_ENABLE 0x10
 #define PX_MASK_RENDER_ENABLE (PX_MASK_SPRITE_ENABLE | PX_MASK_BG_ENABLE)
@@ -47,9 +50,6 @@ extern u8 px_ctrl;
 
 #define px_profile_start() {px_mask |= PX_MASK_GRAY; PPU.mask = px_mask;}
 #define px_profile_end() {px_mask &= ~PX_MASK_GRAY; PPU.mask = px_mask;}
-
-#define px_ppu_enable(flags) px_set_mask_nmi(flags | PX_MASK_RENDER_ENABLE)
-#define px_ppu_disable() px_set_mask_nmi(PX_MASK_RENDER_DISABLE)
 
 #define px_spr_table(tbl) {px_ctrl |= (tbl ? 0xFF : 0x00) & PX_CTRL_SPR_TABLE_ADDR; PPU.control = px_ctrl;}
 #define px_bg_table(tbl) {px_ctrl |= (tbl ? 0xFF : 0x00) & PX_CTRL_BG_TABLE_ADDR; PPU.control = px_ctrl;}
@@ -126,6 +126,9 @@ void px_buffer_inc_v(void);
 // Reserve space to copy bytes to the PPU.
 // The buffer address is returned via PX.buffer.
 void px_buffer_data(u8 len, u16 addr);
+
+// Copy memory to the PPU.
+void px_buffer_blit(u16 addr, void *src, u8 len);
 
 // Add a command to change a PPU palette color.
 void px_buffer_set_color(u8 idx, u8 color);
