@@ -47,8 +47,8 @@ extern u8 px_ctrl;
 #define px_profile_start() {px_mask |= PX_MASK_GRAY; PPU.mask = px_mask;}
 #define px_profile_end() {px_mask &= ~PX_MASK_GRAY; PPU.mask = px_mask;}
 
-#define px_ppu_enable() {px_mask |= PX_MASK_RENDER_ENABLE; PPU.mask = px_mask;}
-#define px_ppu_disable() {px_mask &= ~PX_MASK_RENDER_ENABLE; PPU.mask = px_mask;}
+#define px_ppu_enable(flags) px_set_mask_nmi(flags | PX_MASK_RENDER_ENABLE)
+#define px_ppu_disable() px_set_mask_nmi(0x00)
 
 #define px_spr_table(tbl) {px_ctrl |= (tbl ? 0xFF : 0x00) & PX_CTRL_SPR_TABLE_ADDR; PPU.control = px_ctrl;}
 #define px_bg_table(tbl) {px_ctrl |= (tbl ? 0xFF : 0x00) & PX_CTRL_BG_TABLE_ADDR; PPU.control = px_ctrl;}
@@ -89,6 +89,9 @@ void px_uxrom_select(u8 bank);
 
 // Set the PPU address register.
 #define px_addr(addr) {	PPU.vram.address = addr >> 8; PPU.vram.address = addr & 0xFF;}
+
+// Wait for nmi and set the PPU mask register.
+void px_set_mask_nmi(u8 mask);
 
 // Set the PPU auto-increment direction.
 void px_inc_h(void);

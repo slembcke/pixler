@@ -4,6 +4,7 @@ LD = $(CC65_ROOT)/bin/ld65
 AR = $(CC65_ROOT)/bin/ar65
 
 SRC = \
+	set_mask_nmi.s \
 	coroutine.s \
 	rand8.s \
 	boot.s \
