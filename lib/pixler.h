@@ -6,10 +6,10 @@
 
 // Convince vscode to ignore cc65 features.
 #ifndef __CC65__
-	#define asm(...)
-	#define __A__ 0
-	#define __AX__ 0
-	#define __EAX__ 0
+	#define asm(...) 0
+	#define __A__ (*(uint8_t *)0)
+	#define __AX__ (*(uint16_t *)0)
+	#define __EAX__ (*(uint32_t *)0)
 	#define __fastcall__
 #endif
 
@@ -48,8 +48,8 @@ extern u8 px_ctrl;
 #define PX_CTRL_SPR_TABLE_ADDR 0X08
 #define PX_CTRL_BG_TABLE_ADDR 0x10
 
-#define px_profile_start() {px_mask |= PX_MASK_GRAY; PPU.mask = px_mask;}
-#define px_profile_end() {px_mask &= ~PX_MASK_GRAY; PPU.mask = px_mask;}
+void px_profile_start(void);
+void px_profile_end(void);
 
 #define px_spr_table(tbl) {px_ctrl |= (tbl ? 0xFF : 0x00) & PX_CTRL_SPR_TABLE_ADDR; PPU.control = px_ctrl;}
 #define px_bg_table(tbl) {px_ctrl |= (tbl ? 0xFF : 0x00) & PX_CTRL_BG_TABLE_ADDR; PPU.control = px_ctrl;}

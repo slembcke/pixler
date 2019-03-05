@@ -25,6 +25,7 @@ SRC = \
 	lz4.s \
 	lz4_to_vram.s \
 	lz4_to_ram.s \
+	profile.s \
 
 OBJS = $(SRC:.s=.o)
 
