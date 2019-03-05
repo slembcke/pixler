@@ -26,6 +26,7 @@ SRC = \
 	lz4_to_vram.s \
 	lz4_to_ram.s \
 	profile.s \
+	debug_hex.s \
 
 OBJS = $(SRC:.s=.o)
 

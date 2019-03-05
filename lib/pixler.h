@@ -191,4 +191,8 @@ uintptr_t px_coro_yield(uintptr_t value);
 // Normally you interact with this using the px_spr*() functions.
 extern u8 OAM[256];
 
+// Display a 16 bit number in hex at px_debug_hex_addr.
+extern u16 px_debug_hex_addr;
+void px_debug_hex(u16 value);
+
 #endif
