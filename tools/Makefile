@@ -1,5 +1,5 @@
-CFLAGS += -std=c99 -Wall -Wextra
-BIN = png2chr chr2png lz4x
+CFLAGS += -std=c99 -Wall -Wextra -Os
+BIN = png2chr chr2png lz4x png2edt
 
 .phony: all clean
 
@@ -21,3 +21,6 @@ png2tiles: png2tiles.c slib.o shared.o
 
 lz4x: lz4x.cpp
 	$(CC) -o $@ $<
+
+png2edt: png2edt.o slib.o shared.o
+	$(CC) -o $@ $^ $(CFLAGS) -g -O0 -lpng
