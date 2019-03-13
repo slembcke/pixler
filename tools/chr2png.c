@@ -1,4 +1,3 @@
-#include <alloca.h>
 #include <strings.h>
 #include <sys/stat.h>
 #include <sys/types.h>
