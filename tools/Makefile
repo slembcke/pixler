@@ -23,4 +23,4 @@ lz4x: lz4x.cpp
 	$(CC) -o $@ $<
 
 png2edt: png2edt.o slib.o shared.o
-	$(CC) -o $@ $^ $(CFLAGS) -g -O0 -lpng
+	$(CC) -o $@ $^ $(CFLAGS) -lpng -lm

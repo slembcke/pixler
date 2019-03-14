@@ -1,6 +1,5 @@
+#include <stdlib.h>
 #include <strings.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 
 #include <png.h>
 
@@ -37,8 +36,8 @@ int main(int argc, char *argv[]){
 	fseek(infile, 0, SEEK_SET);
 	SLIB_ASSERT_HARD(size > 0 && size%16 == 0, "File size not a multiple of 16?");
 	
-	u8 *chr_data = alloca(size);
-	fread(chr_data, size, 1, infile);
+	u8 *chr_data = malloc(size);
+	SLIB_ASSERT_HARD(fread(chr_data, size, 1, infile), "Failed to read file contents.");
 	
 	u8 pal[4];
 	sscanf(argv[1], "%02hhx %02hhx %02hhx %02hhx", pal + 0, pal + 1, pal + 2, pal + 3);
@@ -64,7 +63,7 @@ int main(int argc, char *argv[]){
 	png_write_info(png_ptr, info);
 	png_set_packing(png_ptr);
 	
-	u8 *pixels = alloca(w*h);
+	u8 *pixels = malloc(w*h);
 	bzero(pixels, w*h);
 	
 	for(uint i = 0; i < tile_count; i++){
@@ -81,6 +80,9 @@ int main(int argc, char *argv[]){
 
 	png_destroy_info_struct(png_ptr, &info);
 	png_destroy_write_struct(&png_ptr, NULL);
+	
+	free(chr_data);
+	free(pixels);
 	
 	return EXIT_SUCCESS;
 }

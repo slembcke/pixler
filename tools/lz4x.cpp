@@ -21,6 +21,7 @@ Written and placed in the public domain by Ilya Muravyov
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_DISABLE_PERFCRIT_LOCKS
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -661,7 +662,7 @@ int main(int argc, char** argv)
       compress(level==8?WSIZE:1<<level);
   }
 
-  fprintf(stderr, "%lld -> %lld in %1.2fs\n", _ftelli64(fin), _ftelli64(fout),
+  fprintf(stderr, "%" PRId64 " -> %" PRId64 " in %1.2fs\n", _ftelli64(fin), _ftelli64(fout),
       double(clock()-start)/CLOCKS_PER_SEC);
 
   fclose(fin);
