@@ -10,6 +10,10 @@
 
 #define MAX_SQ 256
 #define FP_MULT 8
+#define TILE_SIZE 32
+#define TILE_BYTES (TILE_SIZE*TILE_SIZE)
+
+#define MAX_TEMP_TILES 4096
 
 typedef struct {uint x, y;} uvec;
 
@@ -74,9 +78,9 @@ static uint *generate_sqedt(Image image){
 	return realloc(buff0, sizeof(*buff0)*edt_len);
 }
 
-int find_tile(u8 *tile, u8 tileset[][64], uint count){
+int find_tile(u8 *tile, u8 tileset[][TILE_BYTES], uint count){
 	for(uint i = 0; i < count; i++){
-		if(memcmp(tile, tileset[i], 64) == 0) return i;
+		if(memcmp(tile, tileset[i], TILE_BYTES) == 0) return i;
 	}
 	
 	return -1;
@@ -102,26 +106,31 @@ int main(int argc, char *argv[]){
 	// TODO Apply sample offsets.
 	
 	// Generate collision map and tileset.
-	u8 tileset[256][64];
+	u8 tileset[MAX_TEMP_TILES][TILE_BYTES];
 	uint tileset_count = 0;
 	
-	uint tile_w = image.w/8, tile_h = image.h/8;
+	uint tile_w = image.w/TILE_SIZE, tile_h = image.h/TILE_SIZE;
+	u8 tilemap[tile_w*tile_h];
+	
 	for(uint ty = 0; ty < tile_h; ty++){
 		for(uint tx = 0; tx < tile_w; tx++){
-			u8 *tile_pixels = edt + 8*tx + 8*ty*image.w;
-			u8 tile[64];
-			for(uint row = 0; row < 8; row++) memcpy(tile + 8*row, tile_pixels + image.w*row, 8);
+			u8 *tile_pixels = edt + TILE_SIZE*tx + TILE_SIZE*ty*image.w;
+			u8 tile[TILE_BYTES];
+			for(uint row = 0; row < TILE_SIZE; row++) memcpy(tile + TILE_SIZE*row, tile_pixels + image.w*row, TILE_SIZE);
 			
 			int tile_idx = find_tile(tile, tileset, tileset_count);
 			if(tile_idx < 0){
+				SLIB_ASSERT_HARD(tileset_count < MAX_TEMP_TILES, "Max temp files exceeded. (%d)", MAX_TEMP_TILES);
 				tile_idx = tileset_count;
-				memcpy(tileset[tileset_count], tile, 64);
+				memcpy(tileset[tileset_count], tile, TILE_BYTES);
 				tileset_count += 1;
 			}
 			
-			printf("tile: (%d, %d) -> %d\n", tx, ty, tile_idx);
+			tilemap[tx + ty*tile_w] = tile_idx;
 		}
 	}
+	
+	printf("tile count: %d\n", tileset_count);
 	
 			// printf("tile: (%d, %d)\n", tx, ty);
 			// for(uint y = 0; y < 8; y++){
