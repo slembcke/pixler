@@ -3,11 +3,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
+#include <string.h>
+#include <math.h>
 
 #include "shared.h"
 
-#define MAX 128
+#define MAX_SQ 256
+#define FP_MULT 8
 
 typedef struct {uint x, y;} uvec;
 
@@ -21,13 +23,13 @@ static float intersect_parabolas(uvec a, uvec b){
 uvec v[1024];
 float z[1024];
 
-static void build_hull(uint edt[], uint count){
-	v[0] = (uvec){0, edt[0]};
-	z[0] = -MAX, z[1] = MAX;
+static void build_hull(uint sqedt[], uint count){
+	v[0] = (uvec){0, sqedt[0]};
+	z[0] = -MAX_SQ, z[1] = MAX_SQ;
 	
 	uint k = 0;
 	for(uint i = 1; i < count; i++){
-		uvec p = v[k], q = {i, edt[i]};
+		uvec p = v[k], q = {i, sqedt[i]};
 		float s = intersect_parabolas(p, q);
 		
 		while(s <= z[k]){
@@ -37,7 +39,7 @@ static void build_hull(uint edt[], uint count){
 		k += 1;
 		v[k] = q;
 		z[k] = s;
-		z[k + 1] = i + MAX;
+		z[k + 1] = i + MAX_SQ;
 	}
 }
 
@@ -50,25 +52,34 @@ static void march_parabolas(uint count, uint output[], uint stride){
 	}
 }
 
-static void scan_pass(uint output[], uint input[], uint w, uint h){
+static void separable_sqedt(uint output[], uint input[], uint w, uint h){
 	for(uint row = 0; row < h; row++){
 		build_hull(input + row*w, w);
 		march_parabolas(w, output + row, h);
 	}
 }
 
-static uint *generate_edt(Image image){
+static uint *generate_sqedt(Image image){
 	uint edt_len = image.w*image.h;
 	uint *buff0 = malloc(2*sizeof(*buff0)*edt_len);
 	uint *buff1 = buff0 + edt_len;
 	buff1[0] = 0;
 	
-	// Convert to initial EDT values.
-	for(uint i = 0; i < edt_len; i++) buff0[i] = (image.pixels[i] ? MAX : 0);
+	// Convert to initial squared EDT values.
+	for(uint i = 0; i < edt_len; i++) buff0[i] = (image.pixels[i] ? MAX_SQ : 0);
 	
-	scan_pass(buff1, buff0, image.w, image.h);
-	scan_pass(buff0, buff1, image.h, image.w);
+	// Apply a pair of separable filter passes.
+	separable_sqedt(buff1, buff0, image.w, image.h);
+	separable_sqedt(buff0, buff1, image.h, image.w);
 	return realloc(buff0, sizeof(*buff0)*edt_len);
+}
+
+int find_tile(u8 *tile, u8 tileset[][64], uint count){
+	for(uint i = 0; i < count; i++){
+		if(memcmp(tile, tileset[i], 64) == 0) return i;
+	}
+	
+	return -1;
 }
 
 int main(int argc, char *argv[]){
@@ -77,16 +88,45 @@ int main(int argc, char *argv[]){
 	FILE *infile = fopen(argv[1], "r");
 	SLIB_ASSERT_HARD(infile, "Can't open input file '%s'", argv[1]);
 	
-	// FILE *outfile = fopen(argv[2], "w");
-	// SLIB_ASSERT_HARD(outfile, "Can't open output file '%s'", argv[2]);
+	FILE *outfile = fopen(argv[2], "w");
+	SLIB_ASSERT_HARD(outfile, "Can't open output file '%s'", argv[2]);
 	
 	Image image = read_png(infile);
-	uint *edt = generate_edt(image);
+	uint *sqedt = generate_sqedt(image);
 	
-	for(uint y = 0; y < image.h; y++){
-		for(uint x = 0; x < image.w; x++) printf("%02X ", edt[x + y*image.w]);
-		printf("\n");
+	// Convert to SQEDT to EDT.
+	uint len = image.w*image.h;
+	u8 edt[len];
+	for(uint i = 0; i < len; i++) edt[i] = FP_MULT*sqrtf(sqedt[i]);
+	
+	// TODO Apply sample offsets.
+	
+	// Generate collision map and tileset.
+	u8 tileset[256][64];
+	uint tileset_count = 0;
+	
+	uint tile_w = image.w/8, tile_h = image.h/8;
+	for(uint ty = 0; ty < tile_h; ty++){
+		for(uint tx = 0; tx < tile_w; tx++){
+			u8 *tile_pixels = edt + 8*tx + 8*ty*image.w;
+			u8 tile[64];
+			for(uint row = 0; row < 8; row++) memcpy(tile + 8*row, tile_pixels + image.w*row, 8);
+			
+			int tile_idx = find_tile(tile, tileset, tileset_count);
+			if(tile_idx < 0){
+				tile_idx = tileset_count;
+				memcpy(tileset[tileset_count], tile, 64);
+				tileset_count += 1;
+			}
+			
+			printf("tile: (%d, %d) -> %d\n", tx, ty, tile_idx);
+		}
 	}
 	
+			// printf("tile: (%d, %d)\n", tx, ty);
+			// for(uint y = 0; y < 8; y++){
+			// 	for(uint x = 0; x < 8; x++) printf("%02X ", tile[x + 8*y]);
+			// 	printf("\n");
+			// }
 	return EXIT_SUCCESS;
 }
