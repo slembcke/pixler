@@ -141,6 +141,10 @@ void px_buffer_set_color(u8 idx, u8 color);
 // Clear the current list of sprites.
 void px_spr_clear(void);
 
+#define PX_SPR_BEHIND 32
+#define PX_SPR_FLIPX 64
+#define PX_SPR_FLIPY 128
+
 // Draw a sprite at the given location.
 void px_spr(u8 x, u8 y, u8 attr, u8 chr);
 
