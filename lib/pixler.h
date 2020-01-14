@@ -51,6 +51,9 @@ extern u8 px_ctrl;
 void px_profile_start(void);
 void px_profile_end(void);
 
+#define px_ppu_sync_enable() {px_mask |= PX_MASK_RENDER_ENABLE; px_wait_nmi();}
+#define px_ppu_sync_disable() {px_mask &= ~PX_MASK_RENDER_ENABLE; px_wait_nmi();}
+
 #define px_spr_table(tbl) {px_ctrl |= (tbl ? 0xFF : 0x00) & PX_CTRL_SPR_TABLE_ADDR; PPU.control = px_ctrl;}
 #define px_bg_table(tbl) {px_ctrl |= (tbl ? 0xFF : 0x00) & PX_CTRL_BG_TABLE_ADDR; PPU.control = px_ctrl;}
 
