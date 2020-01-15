@@ -177,16 +177,16 @@ u8 rand8();
 
 // Coroutine body function.
 // 'value' will be the parameter passed to the px_coro_resume() call that starts the coroutine.
-typedef uintptr_t (*naco_func)(uintptr_t value);
+typedef uintptr_t (*coro_func)(uintptr_t value);
 
 // Initialize a coroutine's stack buffer and body function.
 // 7 bytes of buffer space are used for coroutine state.
 // Coroutine does not begin executing until px_coro_resume() is called.
-void px_coro_init(naco_func func, void *naco_buffer, u16 buffer_size);
+void px_coro_init(coro_func func, void *coro_buffer, u16 buffer_size);
 
 // Execute a coroutine until it calls px_coro_yield().
 // The return value is the value the coroutine passes to px_coro_yield();
-uintptr_t px_coro_resume(void *naco_buffer, uintptr_t value);
+uintptr_t px_coro_resume(void *coro_buffer, uintptr_t value);
 
 // Yield from a coroutine back to the main thread.
 // 'value' will be returned by the most recent call to px_coro_resume();

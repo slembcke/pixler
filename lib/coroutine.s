@@ -31,7 +31,7 @@ CORO_BUFF_PTR: .res 2
 .code
 
 ; Swap the stack stored by the coroutine with the one from the C runtime.
-.proc naco_swap_sp
+.proc coro_swap_sp
 	ldy #0
 	lda (CORO_BUFF_PTR), y
 	ldx sp+0
@@ -56,7 +56,7 @@ CORO_BUFF_PTR: .res 2
 ; * The number of stack bytes to be copied from the coroutine's stack to the CPU stack is stored.
 ;   At init time, this value is always 2 for the "catch" function jump address.
 .export _px_coro_init
-.proc _px_coro_init ; naco_func func, u8 *naco_buffer, size_t buffer_size -> void
+.proc _px_coro_init ; coro_func func, u8 *coro_buffer, size_t buffer_size -> void
 	func = ptr1
 	size = sreg
 	
@@ -87,14 +87,14 @@ CORO_BUFF_PTR: .res 2
 	:
 	stx func+1
 	
-	jsr naco_swap_sp
+	jsr coro_swap_sp
 	
 	lda func+1
 	ldx func+0
 	jsr pushax
 	
-	lda #>(naco_catch - 1)
-	ldx #<(naco_catch - 1)
+	lda #>(coro_catch - 1)
+	ldx #<(coro_catch - 1)
 	jsr pushax
 	
 	lda #2
@@ -102,11 +102,11 @@ CORO_BUFF_PTR: .res 2
 	sta (CORO_BUFF_PTR), y
 	
 	; Restore the stack.
-	jmp naco_swap_sp
+	jmp coro_swap_sp
 .endproc
 
 ; Shared by resume/yield/catch
-.proc naco_finish
+.proc coro_finish
 	value = sreg
 	
 	; Pop the jump address from the current stack.
@@ -124,7 +124,7 @@ CORO_BUFF_PTR: .res 2
 
 ; Resume a coroutine.
 .export _px_coro_resume
-.proc _px_coro_resume ; void *naco_buffer, u16 value -> u16
+.proc _px_coro_resume ; void *coro_buffer, u16 value -> u16
 	value = sreg
 	stack_bytes = tmp1
 	
@@ -142,7 +142,7 @@ CORO_BUFF_PTR: .res 2
 	pla
 	jsr pushax
 	
-	jsr naco_swap_sp
+	jsr coro_swap_sp
 	
 	; Load # stack bytes to copy.
 	ldy #2
@@ -162,7 +162,7 @@ CORO_BUFF_PTR: .res 2
 		bne :-
 	jsr addysp
 	
-	jmp naco_finish
+	jmp coro_finish
 .endproc
 
 ; Yield from a coroutine back to the main thread.
@@ -200,14 +200,14 @@ CORO_BUFF_PTR: .res 2
 		cpy #0
 		bne :-
 	
-	jsr naco_swap_sp
-	jmp naco_finish
+	jsr coro_swap_sp
+	jmp coro_finish
 .endproc
 
 ; This is called when a coroutine's body function returns.
 ; It handles the special case, and sets CORO_ERROR to be called if
 ; the coroutine is accidentally resumed after completing.
-.proc naco_catch ; u16 -> u16
+.proc coro_catch ; u16 -> u16
 	value = sreg
 	
 	; Save the resume value;
@@ -224,6 +224,6 @@ CORO_BUFF_PTR: .res 2
 	ldy #2
 	sta (CORO_BUFF_PTR), y
 	
-	jsr naco_swap_sp
-	jmp naco_finish
+	jsr coro_swap_sp
+	jmp coro_finish
 .endproc
